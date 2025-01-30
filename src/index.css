@@ -3,3 +3,12 @@
 @tailwind utilities;
 
 /* ... */
+.tabs-trigger {
+  background-color: #1e2939;
+  color: white;
+}
+
+.tabs-trigger-active {
+  background-color: black;
+  color: white;
+}
