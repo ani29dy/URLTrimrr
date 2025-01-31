@@ -14,6 +14,8 @@ import Error from "./Error";
 import * as Yup from "yup";
 import useFetch from "../hooks/useFetch";
 import { login } from "../db/APIAuth";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { UrlState } from "../Context";
 
 const Login = () => {
   const [errors, setErrors] = useState({});
@@ -21,6 +23,10 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const longLink = searchParams.get("createNew");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,8 +37,13 @@ const Login = () => {
   };
 
   const { data, loading, error, fn: fnLogin } = useFetch(login, formData);
+  const { fetchUser } = UrlState;
+
   useEffect(() => {
-    console.log(data);
+    if (error === null && data) {
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+      fetchUser();
+    }
   }, [data, error]);
 
   const handleLogin = async () => {
