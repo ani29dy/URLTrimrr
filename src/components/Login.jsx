@@ -37,7 +37,7 @@ const Login = () => {
   };
 
   const { data, loading, error, fn: fnLogin } = useFetch(login, formData);
-  const { fetchUser } = UrlState;
+  const { fetchUser } = UrlState();
 
   useEffect(() => {
     if (error === null && data) {
