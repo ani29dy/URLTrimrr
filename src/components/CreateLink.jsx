@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UrlState } from "../Context";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import { QRCode } from "react-qrcode-logo";
 import useFetch from "../hooks/useFetch";
 import { createUrl } from "../db/APIUrls";
-import { BeatLoader } from "react-spinners"
+import { BeatLoader } from "react-spinners";
 
 const CreateLink = () => {
   const { user } = UrlState();
@@ -55,9 +55,30 @@ const CreateLink = () => {
     error,
     data,
     fn: fnCreateUrl,
-  } = useFetch(createUrl { ...formValues, user_id: user.id });
+  } = useFetch(createUrl, { ...formValues, user_id: user.id });
 
-  const createNewLink = () => {}
+  useEffect(() => {
+    if (error === null && data) {
+      navigate(`/link/${data[0].id}`);
+    }
+  }, [error, data]);
+
+  const createNewLink = async () => {
+    setErrors([]);
+    try {
+      await schema.validate(formValues, { abortEarly: false });
+      const canvas = ref.current.canvasRef.current;
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+
+      await fnCreateUrl(blob);
+    } catch (e) {
+      const newErrors = {};
+      e?.inner?.forEach((err) => {
+        newErrors[err.path] = err.message;
+      });
+      setErrors(newErrors);
+    }
+  };
 
   return (
     <Dialog
@@ -67,7 +88,7 @@ const CreateLink = () => {
         if (!res) setSearchParams({});
       }}
     >
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button className="bg-white text-black">Create Link</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -86,7 +107,7 @@ const CreateLink = () => {
           value={formValues.title}
           onChange={handleChange}
         />
-        <Error message={"Some Error"} />
+        {errors.title && <Error message={errors.message} />}
         <Input
           id="longUrl"
           type="text"
@@ -94,7 +115,7 @@ const CreateLink = () => {
           value={formValues.longUrl}
           onChange={handleChange}
         />
-        <Error message={"Some Error"} />
+        {errors.longUrl && <Error message={errors.message} />}
         <div className="flex items-center gap-2">
           <Card className="p-2">urltrimrr.in</Card>
           <Input
@@ -105,7 +126,7 @@ const CreateLink = () => {
             onChange={handleChange}
           />
         </div>
-        <Error message={"Some Error"} />
+        {error && <Error message={error.message} />}
         <DialogFooter>
           <Button className="bg-white text-black" onClick={createNewLink}>
             {loading ? <BeatLoader size={10} color="white" /> : "Create"}
