@@ -28,6 +28,7 @@
     "react-spinners": "^0.15.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "ua-parser-js": "^2.0.2",
     "yup": "^1.6.1"
   },
   "devDependencies": {
