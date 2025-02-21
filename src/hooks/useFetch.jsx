@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const useFetch = (cb, options = {}) => {
   const [data, setData] = useState(null);
@@ -11,6 +11,7 @@ const useFetch = (cb, options = {}) => {
     try {
       const response = await cb(options, ...args);
       setData(response);
+      setError(null);
     } catch (error) {
       setError(error);
     } finally {
